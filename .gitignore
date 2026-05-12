@@ -50,3 +50,4 @@ prisma/migrations/dev.db*
 
 # local agent/tooling kits (not part of the deployable app)
 dream-team-kit/
+.vercel

@@ -1,0 +1,171 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  manager
+}
+
+enum WorkerRole {
+  camarero
+  ayudante_camarero
+  cocinero
+  ayudante_cocinero
+}
+
+enum Zone {
+  planta_0
+  terraza
+}
+
+enum ScheduleStatus {
+  draft
+  published
+}
+
+model Restaurant {
+  id                    String   @id @default(cuid())
+  name                  String
+  timezone              String   @default("Europe/Madrid")
+  operatingHoursStart   Int      @default(360)
+  operatingHoursEnd     Int      @default(1440)
+  terraceSeasonMonths   Int[]    @default([4, 5, 6, 7, 8, 9])
+  terraceHoursStart     Int      @default(660)
+  terraceHoursEnd       Int      @default(1380)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  users   User[]
+  workers Worker[]
+  weeks   ScheduleWeek[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  role         UserRole  @default(manager)
+  restaurantId String
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  authTokens     AuthToken[]
+  publishedWeeks ScheduleWeek[] @relation("PublishedBy")
+
+  @@index([restaurantId])
+}
+
+model AuthToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Worker {
+  id                 String       @id @default(cuid())
+  restaurantId       String
+  displayName        String
+  qualifiedRoles     WorkerRole[]
+  maxWeeklyHours     Int
+  fixedDaysOff       Int[]
+  annualVacationDays Int
+  archivedAt         DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  vacationBlocks VacationBlock[]
+  shifts         Shift[]
+
+  @@index([restaurantId])
+  @@index([restaurantId, archivedAt])
+}
+
+model VacationBlock {
+  id        String   @id @default(cuid())
+  workerId  String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  note      String?
+  createdAt DateTime @default(now())
+
+  worker Worker @relation(fields: [workerId], references: [id], onDelete: Cascade)
+
+  @@index([workerId])
+  @@index([workerId, startDate, endDate])
+}
+
+model ScheduleWeek {
+  id                String         @id @default(cuid())
+  restaurantId      String
+  isoYear           Int
+  isoWeek           Int
+  status            ScheduleStatus @default(draft)
+  publishedAt       DateTime?
+  publishedByUserId String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  publishedBy    User?           @relation("PublishedBy", fields: [publishedByUserId], references: [id])
+  shifts         Shift[]
+  uncoveredSlots UncoveredSlot[]
+
+  @@unique([restaurantId, isoYear, isoWeek])
+  @@index([restaurantId, status])
+}
+
+model Shift {
+  id             String     @id @default(cuid())
+  scheduleWeekId String
+  workerId       String
+  date           DateTime   @db.Date
+  startMinute    Int
+  endMinute      Int
+  zone           Zone
+  role           WorkerRole
+  pinned         Boolean    @default(false)
+  segmentGroupId String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+  worker       Worker       @relation(fields: [workerId], references: [id], onDelete: Restrict)
+
+  @@index([scheduleWeekId])
+  @@index([workerId, date])
+  @@index([scheduleWeekId, date])
+  @@index([segmentGroupId])
+}
+
+model UncoveredSlot {
+  id             String     @id @default(cuid())
+  scheduleWeekId String
+  date           DateTime   @db.Date
+  startMinute    Int
+  endMinute      Int
+  zone           Zone
+  requiredRole   WorkerRole
+  reasonEs       String
+
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleWeekId])
+  @@index([scheduleWeekId, date])
+}

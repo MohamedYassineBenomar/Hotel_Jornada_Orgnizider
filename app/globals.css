@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Jornada palette: off-white canvas, deep ink, warm accent. */
+    --background: 36 33% 97%;
+    --foreground: 24 12% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 24 12% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 12% 12%;
+
+    --primary: 22 78% 46%;
+    --primary-foreground: 36 33% 98%;
+
+    --secondary: 30 20% 92%;
+    --secondary-foreground: 24 12% 18%;
+
+    --muted: 30 18% 94%;
+    --muted-foreground: 24 8% 40%;
+
+    --accent: 30 30% 88%;
+    --accent-foreground: 24 12% 18%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 14% 88%;
+    --input: 30 14% 88%;
+    --ring: 22 78% 46%;
+
+    --radius: 0.5rem;
+
+    /* Role colors — gentle but distinguishable. */
+    --role-camarero: 210 76% 56%;
+    --role-camarero-fg: 0 0% 100%;
+    --role-ayudante-camarero: 198 70% 76%;
+    --role-ayudante-camarero-fg: 210 40% 18%;
+    --role-cocinero: 340 65% 50%;
+    --role-cocinero-fg: 0 0% 100%;
+    --role-ayudante-cocinero: 340 60% 80%;
+    --role-ayudante-cocinero-fg: 340 50% 18%;
+  }
+
+  .dark {
+    --background: 24 10% 8%;
+    --foreground: 36 18% 95%;
+    --card: 24 10% 10%;
+    --card-foreground: 36 18% 95%;
+    --popover: 24 10% 10%;
+    --popover-foreground: 36 18% 95%;
+    --primary: 22 78% 56%;
+    --primary-foreground: 24 12% 8%;
+    --secondary: 24 10% 16%;
+    --secondary-foreground: 36 18% 95%;
+    --muted: 24 10% 16%;
+    --muted-foreground: 30 8% 65%;
+    --accent: 24 10% 16%;
+    --accent-foreground: 36 18% 95%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 24 10% 22%;
+    --input: 24 10% 22%;
+    --ring: 22 78% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

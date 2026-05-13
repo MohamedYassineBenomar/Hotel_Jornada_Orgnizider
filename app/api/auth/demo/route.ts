@@ -13,10 +13,11 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import { env } from "@/lib/env";
 
 const DEMO_EMAIL = "demo@jornada.local";
 
-export async function POST(): Promise<Response> {
+async function signInAsDemo(): Promise<void> {
   const restaurant =
     (await prisma.restaurant.findFirst({ orderBy: { createdAt: "asc" } })) ??
     (await prisma.restaurant.create({
@@ -39,6 +40,14 @@ export async function POST(): Promise<Response> {
   session.restaurantId = user.restaurantId;
   session.role = "manager";
   await session.save();
+}
 
+export async function POST(): Promise<Response> {
+  await signInAsDemo();
   return new NextResponse(null, { status: 204 });
+}
+
+export async function GET(): Promise<Response> {
+  await signInAsDemo();
+  return NextResponse.redirect(`${env().NEXT_PUBLIC_APP_URL}/panel`);
 }

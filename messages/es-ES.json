@@ -22,6 +22,9 @@
   "auth.signin.submit": "Enviar enlace",
   "auth.signin.sending": "Enviando…",
   "auth.signin.error_invalid_email": "Introduce un correo válido.",
+  "auth.signin.divider": "o",
+  "auth.signin.demo_cta": "Entrar como demo",
+  "auth.signin.demo_hint": "Cuenta de ejemplo, sin verificación de correo.",
 
   "auth.check.title": "Revisa tu correo",
   "auth.check.body": "Te hemos enviado un enlace para entrar. Es válido durante 15 minutos.",

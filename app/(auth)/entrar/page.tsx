@@ -42,6 +42,9 @@ export default async function SignInPage({ searchParams }: PageProps) {
           submitLabel={t("auth.signin.submit")}
           sendingLabel={t("auth.signin.sending")}
           invalidEmailMessage={t("auth.signin.error_invalid_email")}
+          dividerLabel={t("auth.signin.divider")}
+          demoLabel={t("auth.signin.demo_cta")}
+          demoHint={t("auth.signin.demo_hint")}
         />
       </div>
     </main>
